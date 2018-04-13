@@ -1,0 +1,40 @@
+body{
+    margin: 0;
+    padding: 0;
+    background: url(a2.jpg);
+    background-size: cover;
+    background-position: center;
+    font-family: sans-serif;
+}
+
+.table input[type="text"]{
+    border: none;
+    border-bottom: 1px solid #fff;
+    background-color: bisque;
+    outline: none;
+    height: 18px;
+    color: black;
+    font-size: 16px;
+}
+
+.getdata{
+    text-align: center;
+    height:40px;
+    padding: 2px 2px 0px;
+}
+.getdata button{
+    text-align: center;
+     border: none;
+    outline: none;
+    height: 30px;
+    background: #fb2525;
+    color: #fff;
+    font-size:18px;
+    border-radius: 20px;
+}
+
+.getdata button:hover{
+    cursor: pointer;
+    background: #ffc107;
+    color:#000;
+}

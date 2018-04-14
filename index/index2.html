@@ -55,7 +55,8 @@
     
       <div class="getdata">
       <button onclick="getdata();">Get Data</button>
-        <button onclick="setdata();">Set Data</button>  
+        <button onclick="setdata();">Set Data</button> 
+          <button onclick="removedata();">Remove Data</button>
         </div>
     
         
@@ -129,7 +130,10 @@ function time() {
     return i;
     }
 }
-           
+ function removedata(){
+     database.ref("Data/").remove();
+     ref.child("numberdata").set(0);
+ }          
 function writeData(id,date,hour,minute,second,time){
     database.ref('Data/' + id).set({
 		Date: date,
@@ -158,7 +162,7 @@ function setdata() {
     today = dd1+'-'+mm1+'-'+yyyy1;
     writeData(num+1,today,h1,m1,s1,nowTime2);
     ref.child("numberdata").set(num+1);   
-    setTimeout(setdata, 1000);
+   // setTimeout(setdata, 1000);
      function checkTime(i)
     {
     if (i<10)

@@ -131,7 +131,7 @@ function time() {
     }
 }
  function removedata(){
-     database.ref("Data/").remove();
+    database.ref("Data/").remove();
      ref.child("numberdata").set(0);
  }          
 function writeData(id,date,hour,minute,second,time){

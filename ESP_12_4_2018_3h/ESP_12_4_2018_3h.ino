@@ -1,21 +1,35 @@
-  #include <ESP8266HTTPClient.h>
+//#include <RS485_protocol.h>
 
 #include <ESP8266WiFi.h>
 #include <time.h>
-#include <String.h>
+//#include <SoftwareSerial.h>
+#include <Ticker.h>  //Ticker Library
+ 
+Ticker blinker;
+
 #include <FirebaseArduino.h>
+//SoftwareSerial mySerial(4,5);//rx,tx
+//#define FIREBASE_HOST "esp-android-45417.firebaseio.com"
+//#define FIREBASE_AUTH "q1D40Nuj8OymmG1f7flGqvL2LmcGIOrdSiRtYpau"
 #define FIREBASE_HOST "nodemcu-6edef.firebaseio.com"
 #define FIREBASE_AUTH "SAAcgZRobeLw4eEBmltPc9AbfJyhsvFEwy5lKAyA"
+
+#define WIFI_SSID "TAKEMOTOVN"
+#define WIFI_PASSWORD "Hakaru+0007"
 #define MAX485_DE      4
 #define MAX485_RE_NEG  5
-const char* ssid = "HAKARU_VNPT";
-const char* password = "Hakaru+0007";
-int timezone = 7;
-int dst = 0;
-unsigned char RxData[11];
-unsigned char i,j,FLG,Rxflag;
+
+unsigned char RxData[11]={
+  0x01
+};
+unsigned char TxMsg [8]={0x01,0x04,0x0F,0xA1,0x00,0x03,0xe2,0xfd};
+unsigned char i,j=0,FLG,Rxflag;
 unsigned short CRC;
 unsigned long Time1,a;
+int dem;
+int timezone = 7;
+int dst = 0;
+
 void CRC_RX(unsigned char Data[],unsigned char length)
       {
         unsigned char *Pointer;
@@ -41,120 +55,116 @@ void CRC_RX(unsigned char Data[],unsigned char length)
         int crcl = (crc & 0xFF00)/256; //Swaping  the bytes
         int crch = (crc & 0x00FF);
         CRC = crch <<8| crcl;
-        if (CRC==Data[length-2]*256+Data[length-1]) FLG=1; else FLG=0;
-        //if (CRC==(Data[length-2]<<8|Data[length-1])) FLG=1; else FLG=0;
+        //if (CRC==Data[length-2]*256+Data[length-1]) FLG=1; else FLG=0;
+        if (CRC==(Data[length-2]<<8|Data[length-1])) FLG=1; else FLG=0;
       }
 
-void setup() {
+ time_t rawtime;
+ struct tm * timeinfo;
+ char buffer [80];
+ char buffer1 [80];
+void receivedata(){
+ // postTrans();
+  while (Serial.available()>0)
+  {
+    a=millis()-Time1;
+    Time1=millis(); 
+    if(a>=800) {j=0;}
+    RxData[j]=Serial.read();
+    j+=1;
+    if (j==11) {FLG=0;CRC_RX(RxData,11);j=0;}
+  }
+      
+  if(FLG==1){
+      digitalWrite(14,HIGH);
+      
+      String d= "Data/";
+      d=d+dem;
+      String date=d+"/Date";
+      String timE=d+"/Time";
+      Firebase.setString(timE,buffer);
+      String hour=d+"/Hour";
+      String minu=d+"/Minute";
+      String second=d+"/Second";
+       
+      
+     // Firebase.setString("STARTup","ok"); 
+      Firebase.setInt(hour,(int)RxData[3]<<8|RxData[4]); 
+      Firebase.setInt(minu,(int)RxData[5]<<8|RxData[6]); 
+      Firebase.setInt(second,(int)RxData[7]<<8|RxData[8]);
+      
+      Firebase.setString(date,buffer1);
+      Firebase.setInt("numberdata",dem);
+      digitalWrite(14,LOW);
+      }
+  
+      if(FLG==0) //digitalWrite(0,LOW);
+      {//Firebase.setString("STARTup","fail"); 
+     // Firebase.setInt("Rx0",RxData[0]); 
+      //Firebase.setInt("Rx1",RxData[1]); 
+     //// Firebase.setInt("Rx2",RxData[2]); 
+     // Firebase.setInt("Rx3",RxData[3]); 
+     // Firebase.setInt("Rx4",RxData[4]); 
+    //  Firebase.setInt("Rx5",RxData[5]); 
+    //  Firebase.setInt("Rx6",RxData[6]); 
+    //  Firebase.setInt("Rx7",RxData[7]); 
+      digitalWrite(14,LOW);
+      dem--;}
+ 
+      FLG=0;
+      dem++;
+     // preTrans();
+  
+};
+void Request(){
+      Serial.write("@");  
+}
+void setup(){
   Time1=0;
   pinMode(MAX485_RE_NEG, OUTPUT);
   pinMode(MAX485_DE, OUTPUT);
+  pinMode(14,OUTPUT);
+  digitalWrite(14,LOW);
+  // Init in receive mode
   digitalWrite(MAX485_RE_NEG, 0);
   digitalWrite(MAX485_DE, 0);
-  
-  Serial.begin(9600);
-  Serial.setDebugOutput(true);
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
- // Serial.println("\nConnecting to WiFi");
+    Serial.begin(9600);
+    //Serial.swap();
+  //mySerial.begin(9600);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  //Serial.print("connecting");
   while (WiFi.status() != WL_CONNECTED) {
- //   Serial.print(".");
-    delay(1000);
-  }
+    //Serial.print(".");
+    delay(500);
+  };
+  //Serial.println();
+  //Serial.print("connected: ");
+  //Serial.println(WiFi.localIP());
   configTime(timezone * 3600, dst * 0, "pool.ntp.org", "time.nist.gov");
- // Serial.println("\nWaiting for time");
+  //Serial.println("\nWaiting for time");
   while (!time(nullptr)) {
- //   Serial.print(".");
+    //Serial.print(".");
     delay(1000);
   }
-//  Serial.println("");
+  
+      
   Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
- 
+  Firebase.setString("STARTup","ready"); 
+  dem= Firebase.getInt("numberdata")+1;
+  blinker.attach(5, Request);
 }
 
-void loop() {
-  int t,t2,h,m,s;
-  time_t rawtime;
-  struct tm * timeinfo;
-   char buffer [80];
-  char buffer1 [80];
-  t=Firebase.getInt("numberdata");
-  t2=t+1;
-  while (1){ 
-  while (WiFi.status() == WL_CONNECTED) {
-        while (Serial.available()>0)
-  {
-    //a= millis()- Time1;
-    //Time1=millis();
-    //Firebase.setInt("a",a);
-   // if(a>500) j=0;
-    RxData[j]=Serial.read();
-    j+=1;
-    if (j==11) {CRC_RX(RxData,11);j=0;Serial.end();
-    if(FLG==1){
+
+void loop(){          //xong,chạy ngon, nhớ nối đất chung.
+
+  //while (WiFi.status() == WL_CONNECTED) {
+     
+      time (&rawtime);
+      timeinfo = localtime (&rawtime);
+      strftime (buffer,80,"%X",timeinfo);
+      strftime (buffer1,80,"%d-%m-%Y",timeinfo);
     
- // Firebase.setInt("Rx_1",(int)RxData[3]<<8|RxData[4]); 
-//  Firebase.setInt("Rx_2",(int)RxData[5]<<8|RxData[6]); 
- // Firebase.setInt("Rx_3",(int)RxData[7]<<8|RxData[8]);
-   
-  
-  h=(int)RxData[3]<<8|RxData[4];
-  m=(int)RxData[5]<<8|RxData[6];
-  s=(int)RxData[7]<<8|RxData[8];
-   
- 
-
-  //time_t now = time(nullptr);
-  //Serial.println(ctime(&now));
-  time (&rawtime);
-  timeinfo = localtime (&rawtime);
-
-  strftime (buffer,80,"%d-%m-%Y",timeinfo);
-  strftime (buffer1,80,"%X",timeinfo);
- // Serial.println(buffer);
-  String a1;
-  String a;
-  a1=String("Data/");
-  a1 += t2;
-  a += a1;
-  a += "/Date";
-  String b;
-
-  b += a1;
-  b += "/Hour";
-  String c;
-
-  c += a1;
-  c += "/Minute";
-  String d;
- 
-  d += a1;
-  d += "/Second";
-
-  String e;
-  e += a1;
-  e += "/Time";
- // b="Data/"+(char)t2+"Hour";
- // c="Data/"+(char)t2+"Minute";
- // d="Data/"+(char)t2+"Second";
-  Firebase.setInt(b,h);
-  if (Firebase.failed()) Firebase.remove(a1);
-  else{
-  Firebase.setInt(c,m);
-  if (Firebase.failed()) Firebase.remove(a1);
-  else{
-  Firebase.setInt(d,s);
-  if (Firebase.failed()) Firebase.remove(a1);
-  else{
-  Firebase.setString(a,buffer);
-  if (Firebase.failed()) Firebase.remove(a1);
-  else{
-  Firebase.setString(e,buffer1);
-  if (Firebase.failed()) Firebase.remove(a1);
-  else
-  Firebase.setInt("numberdata",t2);
-  t2++;
-  }}}}
- // delay(500);
-    }Serial.begin(9600);
-    }}delay(100);}}}
+      receivedata();
+      //delay(2000);
+    //}
+  }

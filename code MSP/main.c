@@ -8,14 +8,14 @@ int second,minute,hour,secondhold,minutehold,hourhold,secondchange,minutechange,
 int secondhold1,minutehold1,hourhold1;
 float first=0.00;
 const float delta=0.00001;
-unsigned char *PTxData;                     // Pointer to TX data sdasdwdweqwesdsdasdasd
+unsigned char *PTxData;                     // Pointer to TX data
 unsigned char TXByteCtr;
 unsigned char timer1sFLG,timer05sFLG;
 unsigned char timer5sFLG;
 unsigned char timehold,blinkbit;
 unsigned char Rxflag;
 unsigned char state;
-unsigned char RxflagESP;
+unsigned char RxArrayFLG;
 int r1;
 unsigned char TxData[41] =              // Table of data to transmit
 	{
@@ -33,7 +33,7 @@ unsigned char TxData[41] =              // Table of data to transmit
 
 	};
 unsigned char g;
-unsigned char RxData[8];
+unsigned char RxData[20];
 unsigned char TxDataUART[11]={
 		0x01,
 
@@ -456,25 +456,11 @@ void UartSend_String(unsigned char Data[], unsigned char Length) {
 
 }
 void UART(){
-/*	if(RxflagESP==1){
-		P5OUT ^= BIT0;
-		TxDataUART[1]=0x04;
-		TxDataUART[2]=0x06;
-		TxDataUART[3]=0x00;
-		TxDataUART[4]=hour;
-		TxDataUART[5]=0x00;
-		TxDataUART[6]=minute;
-		TxDataUART[7]=0x00;
-		TxDataUART[8]=second;
-		lenTx=11;
-		CRC_TX(TxDataUART,lenTx);
-		UartSend_String(TxDataUART,lenTx);
-		RxflagESP=0;
-	}*/
-	if(s==8){
+
+	if(Rxflag==1){
 
 		P5OUT ^= BIT0;
-		//UartSend_String(RxData,8);
+	//	UartSend_String(RxData,8);
 
 
 
@@ -482,6 +468,15 @@ void UART(){
 		//hienthi(RxData[7]);
 		//sendI2C();
 		CRC_RX(RxData,8);
+		//setupdulieu();
+		//		hienthi(CRC);
+		//		sendI2C();
+		/*if (FLG==0){
+			unsigned char po;
+			for(po=0;po<sizeof RxData;po++)
+				RxData[po]=0x00;
+			s=0;
+		}*/
 		if (FLG==1){//P5OUT ^= BIT0;
 		res=RxData[2]*256+RxData[3];
 		lenres=RxData[4]*256+RxData[5];
@@ -550,7 +545,10 @@ void UART(){
 
 		CRC_TX(TxDataUART,lenTx);
 		UartSend_String(TxDataUART,lenTx);}
-		s=0;
+		P2OUT |= BIT3;
+		Rxflag=0;
+
+		//RxArrayFLG=1;
 
 }
 }
@@ -612,7 +610,7 @@ int main(void)
   //	  hienthifloat(15.234);
   	//  sendI2C();
 	timer1sFLG=0;
-	timer5sFLG=0;
+	RxArrayFLG=1;
 	state=1;
 	s=0;
 	while (1)
@@ -718,7 +716,7 @@ if (timer1sFLG==1) {
 	hienthiminute(minute);
 	hienthihour(hour);
 	sendI2C();}
-	UART();
+	//UART();
 	timer1sFLG=0;
 
 }
@@ -748,8 +746,8 @@ __interrupt void TimerInterruptCCR0(void){
 		x += 1;
 	e+=1;if(e>=6) e=6;
 
-	if (timer5sFLG==1) {f=0;timer5sFLG=0;}
-	f +=1;
+	//if (timer5sFLG==1) {f=0;timer5sFLG=0;}
+	//f +=1;
 }
 #pragma vector = USCIAB1TX_VECTOR
 __interrupt void USCIAB1TX_ISR(void)
@@ -770,13 +768,16 @@ __interrupt void USCIAB1TX_ISR(void)
 #pragma vector = USCIAB0RX_VECTOR
 __interrupt void USCIAB0RX_ISR(void)
 {
+
 	//timer5sFLG=1;
-	if ((f>900)||(s==8)) {s=0;};
+	//if ((f>900)||(s==8)) {s=0;};
+	//if(Rxflag!=1){
 	RxData[s]=UCA0RXBUF;
-	s++;
+	s++;//}
+	if (s>=8) {Rxflag=1;g=8;P2OUT &= ~BIT3;s=0;};
 	//f=s;
 	//if(s>=8) {Rxflag=1;g=8;};
-	timer5sFLG=1;
+	//timer5sFLG=1;
 	//f=0;
 	/*if (UCA0RXBUF=='@') {RxflagESP=1;state=0;}
 	if (UCA0RXBUF!='@') {state=1;}
@@ -848,4 +849,5 @@ __interrupt void USCIAB0RX_ISR(void)
 
 
 }
+
 

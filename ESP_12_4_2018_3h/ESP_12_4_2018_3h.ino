@@ -133,6 +133,11 @@ void setup(){
  // digitalWrite(MAX485_RE_NEG, 0);
  // digitalWrite(MAX485_DE, 0);
     Serial.begin(9600,SERIAL_8E1);
+   /*  int k=0;
+      for(k=0;k<8;k++)
+      {Serial.write(TxMsg[k]);
+      delayMicroseconds(1200);
+      };*/  
     //Serial.swap();
   //mySerial.begin(9600);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);

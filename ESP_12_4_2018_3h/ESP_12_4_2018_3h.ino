@@ -14,10 +14,10 @@ Ticker blinker;
 #define FIREBASE_HOST "nodemcu-6edef.firebaseio.com"
 #define FIREBASE_AUTH "SAAcgZRobeLw4eEBmltPc9AbfJyhsvFEwy5lKAyA"
 
-#define WIFI_SSID "TAKEMOTOVN"
+#define WIFI_SSID "HAKARU_VNPT"
 #define WIFI_PASSWORD "Hakaru+0007"
-#define MAX485_DE      4
-#define MAX485_RE_NEG  5
+//#define MAX485_DE      4
+//#define MAX485_RE_NEG  5
 
 unsigned char RxData[11]={
   0x01
@@ -125,13 +125,13 @@ void Request(){
 }
 void setup(){
   Time1=0;
-  pinMode(MAX485_RE_NEG, OUTPUT);
-  pinMode(MAX485_DE, OUTPUT);
+  //pinMode(MAX485_RE_NEG, OUTPUT);
+ // pinMode(MAX485_DE, OUTPUT);
   pinMode(14,OUTPUT);
   digitalWrite(14,LOW);
   // Init in receive mode
-  digitalWrite(MAX485_RE_NEG, 0);
-  digitalWrite(MAX485_DE, 0);
+ // digitalWrite(MAX485_RE_NEG, 0);
+ // digitalWrite(MAX485_DE, 0);
     Serial.begin(9600,SERIAL_8E1);
     //Serial.swap();
   //mySerial.begin(9600);

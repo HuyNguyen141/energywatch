@@ -7,16 +7,26 @@ body{
     font-family: sans-serif;
 }
 
-.table input[type="text"]{
+.table input[type="date"]{
     border: none;
-    border-bottom: 1px solid #fff;
+    border-bottom: 0px solid #fff;
     background-color: bisque;
     outline: none;
-    height: 18px;
+    height: 30px;
+    width: 200px;
     color: black;
-    font-size: 16px;
+    font-size: 22px;
 }
-
+.table input[type="time"]{
+    border: none;
+    border-bottom: 0px solid #fff;
+    background-color: bisque;
+    outline: none;
+    height: 30px;
+    width: 200px;
+    color: black;
+    font-size: 22px;
+}
 .getdata{
     text-align: center;
     height:40px;

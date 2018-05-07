@@ -27,29 +27,12 @@
             <table class="table" align="center" bgColor=#175 width=500px; height=200px; border=1>
                 <tr><th colspan=2>Input Start Time</th><th colspan=2>Input Stop Time</th></tr>
             <tr>
-                <th>Day</th><th><input type="text"  placeholder="Enter day" id="day1"></th>
-                <th>Day</th><th><input type="text"  placeholder="Enter day" id="day2"></th>
+                <th>Date</th><th><input type="date"  placeholder="Enter date" id="dateinput1"></th>
+                <th>Date</th><th><input type="date"  placeholder="Enter date" id="dateinput2"></th>
                 </tr>
             <tr>
-                <th>Month</th><th><input type="text"  placeholder="Enter month" id="month1"></th>
-                 <th>Month</th><th><input type="text"  placeholder="Enter month" id="month2"></th>
-                </tr>
-              <tr>
-                <th>Year</th><th><input type="text"  placeholder="Enter year" id="year1"></th>
-                   <th>Year</th><th><input type="text"  placeholder="Enter year" id="year2"></th>
-                </tr>
-                <tr>
-                <th>Hour</th><th><input type="text"  placeholder="Enter hour" id="hour1"></th>
-                     <th>Hour</th><th><input type="text"  placeholder="Enter hour" id="hour2"></th>
-                </tr>
-                <tr>
-                <th>Minute</th><th><input type="text"  placeholder="Enter minute" id="minute1"></th>
-                      <th>Minute</th><th><input type="text"  placeholder="Enter minute" id="minute2"></th>
-                </tr>
-                <tr>
-                <th>Second</th><th><input type="text"  placeholder="Enter second" id="second1"></th>
-                <th>Second</th><th><input type="text"  placeholder="Enter second" id="second2"></th>
-                </tr>
+                <th>Time</th><th><input type="time" name="appt-time" step="1"  placeholder="Enter time" id="timeinput1"></th>
+                <th>Time</th><th><input type="time" name="appt-time" step="1"  placeholder="Enter time" id="timeinput2"></th></tr>
             </table>
        
     
@@ -182,18 +165,22 @@ function setdata() {
                
 function getdata(){
    
-    var day1=document.getElementById("day1").value;
-    var month1=document.getElementById("month1").value;
-    var year1=document.getElementById("year1").value;
-    var hour1=document.getElementById("hour1").value;
-    var minute1=document.getElementById("minute1").value;
-    var second1=document.getElementById("second1").value;
-    var day2=document.getElementById("day2").value;
-    var month2=document.getElementById("month2").value;
-    var year2=document.getElementById("year2").value;
-    var hour2=document.getElementById("hour2").value;
-    var minute2=document.getElementById("minute2").value;
-    var second2=document.getElementById("second2").value;
+    var dateinput1=document.getElementById("dateinput1").value;
+    var dateinput2=document.getElementById("dateinput2").value;
+    var timeinput1=document.getElementById("timeinput1").value;
+    var timeinput2=document.getElementById("timeinput2").value;
+    var day1=0;
+    var month1=0;
+    var year1=0;
+    var hour1=0;
+    var minute1=0;
+    var second1=0;
+    var day2=0;
+    var month2=0;
+    var year2=0;
+    var hour2=0;
+    var minute2=0;
+    var second2=0;
     var M=0;
     var M2=0;
     var OK=0;
@@ -201,57 +188,96 @@ function getdata(){
     var FLG2=0;
     var FLG3=0;
     var newWindow;
-    
-    day1=parseInt(day1);
-    month1=parseInt(month1);
-    year1=parseInt(year1);
-    hour1=parseInt(hour1);
-    minute1=parseInt(minute1);
-    second1=parseInt(second1);
-    day2=parseInt(day2);
-    month2=parseInt(month2);
-    year2=parseInt(year2);
-    hour2=parseInt(hour2);
-    minute2=parseInt(minute2);
-    second2=parseInt(second2);
-    
-    if((month1==1)||(month1==3)||(month1==5)||(month1==7)||(month1==8)||(month1==10)||(month1==12)) M=31;
-    if((month1==4)||(month1==6)||(month1==9)||(month1==11)) M=30;
-    if (month1==2){if(namnhuan(month1)) M=29; else M=28;};
-    
-    if ((day1<0) || (month1<0) || (year1<0) || (day1>M) || (month1>12) || (hour1<0) || (hour1>23) || (minute1<0) || (minute1>59) || (second1<0) || (second1>59))
-    alert("invalid input start time");
-    else 
-    {
-    if((month2==1)||(month2==3)||(month2==5)||(month2==7)||(month2==8)||(month2==10)||(month2==12)) M2=31;
-    if((month2==4)||(month2==6)||(month2==9)||(month2==11)) M2=30;
-    if (month2==2){if(namnhuan(month2)) M2=29; else M2=28;};    
-    if ((day2<0) || (month2<0) || (year2<0) || (day2>M2) || (month2>12)|| (hour2<0) || (hour2>23) || (minute2<0) || (minute2>59) || (second2<0) || (second2>59))
-    alert("invalid input stop time"); 
-        else 
-            {
-            if (year2<year1) {alert("error stop time");OK=0;};
-            if(year2==year1){
-                    if (month2<month1) {alert("error stop time"); OK=0;};
-                    if(month2==month1){
-                            if(day2<day1) {alert("error stop time");OK=0;};
-                            if(day2==day1){
-                                    if(hour2<hour1) {alert("error stop time");OK=0;};
-                                    if(hour2==hour1){
-                                            if(minute2<minute1) {alert("error stop time");OK=0;};
-                                            if(minute2==minute1){
-                                                    if(second2<second1) {alert("error stop time");OK=0;}; 
-                                                    if(second2>=second1) OK=1;
-                                            };
-                                            if(minute2>minute1) OK=1;    
-                                        };
-                                    if(hour2>hour1) OK=1; };
-                            if(day2>day1) OK=1;};
-                    if(month2>month1) OK=1;};
-            if (year2>year1) OK=1;
-                                   
+    if((dateinput1=="")||(dateinput2=="")||(timeinput1=="")||(timeinput2=="")) {OK=0;alert("invalid time");}
+    else {
+    var mang1 = new Array();
+    mang1 = dateinput1;
+        //alert(mang1[M]);
+       while (mang1[M]!='-'){
+            year1 =year1*10 + parseInt(mang1[M]);
+            M++;
+           
+        }
+        M++;  
+        while (mang1[M]!='-'){     
+            month1 = month1*10 + parseInt(mang1[M]);
+            M++;   
+        }
+        M++;
+        while (M<mang1.length){   
+            day1 = day1*10 + parseInt(mang1[M]);
+            M++;   
+        }
+        M=0;
+        mang1= timeinput1;
+        if (mang1.length==5) {timeinput1=timeinput1+":00";mang1=timeinput1;};
+         while (mang1[M]!=':'){
+            hour1 =hour1*10 + parseInt(mang1[M]);
+            M++;
+           
+        }
+        M++;  
+        while (mang1[M]!=':'){     
+            minute1 = minute1*10 + parseInt(mang1[M]);
+            M++;   
+        }
+        M++;
+        while (M<mang1.length){   
+            second1 = second1*10 + parseInt(mang1[M]);
+            M++;   
+        }
+        M=0;
+         mang1 = dateinput2;
+        
+       while (mang1[M]!='-'){
+            year2 =year2*10 + parseInt(mang1[M]);
+            M++;
+           
+        }
+        M++;  
+        while (mang1[M]!='-'){     
+            month2 = month2*10 + parseInt(mang1[M]);
+            M++;   
+        }
+        M++;
+        while (M<mang1.length){   
+            day2 = day2*10 + parseInt(mang1[M]);
+            M++;   
+        }
+        M=0;
+        mang1= timeinput2;
+        if (mang1.length==5) {timeinput2=timeinput2+":00";mang1=timeinput2;};
+         while (mang1[M]!=':'){
+            hour2 =hour2*10 + parseInt(mang1[M]);
+            M++;
+           
+        }
+        M++;  
+        while (mang1[M]!=':'){     
+            minute2 = minute2*10 + parseInt(mang1[M]);
+            M++;   
+        }
+        M++;
+        while (M<mang1.length){   
+            second2 = second2*10 + parseInt(mang1[M]);
+            M++;   
+        }
+        alert(year1);
+        alert(month1);
+        alert(day1);
+        alert(hour1);
+        alert(minute1);
+        alert(second1);
+        var ISO_00= new Date(year1,month1-1,day1,hour1,minute1,second1);
+        var ISO_01 = new Date(year2,month2-1,day2,hour2,minute2,second2);
+        var thoigianstart=Number(ISO_00);
+        var thoigianstop=Number(ISO_01);
+        if(thoigianstart>thoigianstop) {alert("invalid stop time");OK=0;}
+        else OK=1;
+        
     }
-    }
+    
+    
    
     
     if(OK==1){
